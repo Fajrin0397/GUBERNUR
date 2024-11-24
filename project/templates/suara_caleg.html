@@ -1,0 +1,311 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="shadow p-3 mb-5 bg-white rounded mt-1">
+    <form action="" method="post">
+        {{form.csrf_token()}}
+        <div class="row">
+            <div class="col-md-3">
+                {{form.drdpil.label(class="form-control-label")}}
+                {%if form.drdpil.errors%}
+                    {{form.drdpil(class="form-control is-invalid")}}
+                    <div class="invalid-feedback">
+                        {% for error in form.drdpil.errors %}
+                        <span>{{error}}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{form.drdpil(class="form-control form-control-sm")}}
+                {% endif %}
+            </div>
+            <div class="col-md-3">
+                {{form.partaiId.label(class="form-control-label")}}
+                {%if form.partaiId.errors%}
+                    {{form.partaiId(class="form-control is-invalid")}}
+                    <div class="invalid-feedback">
+                        {% for error in form.partaiId.errors %}
+                        <span>{{error}}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{form.partaiId(class="form-control form-control-sm")}}
+                {% endif %}
+            </div>
+            <div class="col-md-2">
+                {{form.nm_calon.label(class="form-control-label")}}
+                {%if form.nm_calon.errors%}
+                    {{form.nm_calon(class="form-control is-invalid")}}
+                    <div class="invalid-feedback">
+                        {% for error in form.nm_calon.errors %}
+                        <span>{{error}}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{form.nm_calon(class="form-control form-control-sm")}}
+                {% endif %}
+            </div>
+            <div class="col-md-2">
+                {{form.kecamatanId.label(class="form-control-label")}}
+                {%if form.kecamatanId.errors%}
+                    {{form.kecamatanId(class="form-control is-invalid")}}
+                    <div class="invalid-feedback">
+                        {% for error in form.kecamatanId.errors %}
+                        <span>{{error}}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{form.kecamatanId(class="form-control form-control-sm")}}
+                {% endif %}
+            </div>
+            <div class="col-md-2">
+                {{form.kelurahanId.label(class="form-control-label")}}
+                {%if form.kelurahanId.errors%}
+                    {{form.kelurahanId(class="form-control is-invalid")}}
+                    <div class="invalid-feedback">
+                        {% for error in form.kelurahanId.errors %}
+                        <span>{{error}}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{form.kelurahanId(class="form-control form-control-sm")}}
+                {% endif %}
+            </div>
+
+            <div class="col-md-2">
+                {{form.no_tpsid.label(class="form-control-label")}}
+                {%if form.no_tpsid.errors%}
+                    {{form.no_tpsid(class="form-control is-invalid")}}
+                    <div class="invalid-feedback">
+                        {% for error in form.no_tpsid.errors %}
+                        <span>{{error}}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{form.no_tpsid(class="form-control form-control-sm")}}
+                {% endif %}
+            </div>
+
+            <div class="col-md-1">
+                {{form.total.label(class="form-control-label")}}
+                {%if form.total.errors%}
+                    {{form.total(class="form-control is-invalid")}}
+                    <div class="invalid-feedback">
+                        {% for error in form.total.errors %}
+                        <span>{{error}}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{form.total(class="form-control form-control-sm")}}
+                {% endif %}
+            </div>
+            <div>
+                {%if form.emailName.errors%}
+                {{form.emailName(class="form-control is-invalid")}}
+                <div class="invalid-feedback">
+                    {% for error in form.emailName.errors %}
+                    <span>{{error}}</span>
+                    {% endfor %}
+                </div>
+                {% else %}
+                    {{form.emailName(value=current_user.email)}}
+                {% endif %}
+            </div>
+         </div>
+
+         <div class="row">
+            <div class="col-md-2 mt-1">
+                {{form.submit(class="btn btn-primary")}} 
+            </div>
+         </div>
+        </div>
+    </form>
+
+<div class="shadow p-3 mb-5 bg-white rounded mt-1">
+    <form action="/cari-caleg" method="post">
+        <input type="text" name="legis" class="p-1 mb-2 form-control " id="legis" placeholder="cari nama caleg">
+    </form>
+        <table class="table table-striped">
+        <thead>
+          <tr>
+            <th scope="col">No</th>
+            <th scope="col">Legislatif</th>
+            <th scope="col">Suara</th>
+            <th scope="col">Dapil</th>
+            <th scope="col">Nama TPS</th>
+            <th scope="col">Aksi</th>
+          </tr>
+        </thead>
+        <tbody id="tabledata">
+           {% for c in clg %}
+          <tr>
+            <th scope="row">{{loop.index}}</th>
+            <td>{{c.suara_calegT.nama}}</td>
+            <td>{{c.total_s}}</td>
+            <td>{{c.dpil.nama_dapil}}</td>
+            <td>{{c.srcaleg.nama_tps}}</td>
+            <td>
+              <button type="button" class="btn btn-warning btn-sm" data-toggle="modal" data-target="#exampleModal-{{c.id}}">
+                  Hapus
+              </button>
+              <a href="{{url_for('member.edit_suara', id=c.id)}}" class="btn btn-primary btn-sm" >edit </a>
+            </td>
+          </tr>
+          <!-- modal-hapus -->
+        
+           
+        <div class="modal fade" id="exampleModal-{{c.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel"></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                 <strong> apakah anda ingin menghapus hasil suara dari {{c.suara_calegT.nama}}</strong>
+              </div>
+              <div class="modal-footer">
+                <form method="POST" action="{{url_for('member.hapus_suara', id=c.id)}}">
+                 <button type="submit" class="btn btn-danger btn-sm" >Hapus</button>
+                </form>
+                <button type="button" class="btn btn-warning btn-sm" data-dismiss="modal">Batal</button>
+              </div>
+            </div>
+          </div>
+        </div>
+            {% endfor %}
+        </tbody>
+      </table>
+</div>
+
+{%block tail%}
+<script>
+    var dapil_select = document.getElementById('drdpil');
+    var nm_caleg = document.getElementById('nm_calon');
+    var nm_partai = document.getElementById('partaiId');
+    /*
+    dapil_select.onchange = function(){
+    let dapil = dapil_select.value
+    // console.log(dapil)
+    fetch('/nama-caleg/'+dapil)
+     .then(function(tgpn){
+         return tgpn.json()
+     })
+     .then(function(data){
+        let optionHtml = '<option value=""> Pilih Nama Caleg</option>';
+        for(nm of data.nama){
+            optionHtml += '<option value="'+ nm.id +'">'+ nm.nama_caleg+'</option>'
+        }
+        nm_caleg.innerHTML = optionHtml
+     })
+    }
+    */
+    nm_partai.onchange = function(){
+    let partai = nm_partai.value
+    let dapil = dapil_select.value
+    fetch('/nama-partai/'+partai+'/'+dapil)
+    .then(function(tgpn){
+     return tgpn.json()
+    })
+    .then(function(data){
+    let optionHtml = '<option value=""> Pilih Nama Caleg</option>';
+    for(nm of data.nama){
+        optionHtml += '<option value="'+ nm.id +'">'+ nm.nama_caleg+'</option>'
+    }
+    nm_caleg.innerHTML = optionHtml
+    })
+    }
+
+    
+    var kec_select = document.getElementById('kecamatanId');
+    var kel_select = document.getElementById('kelurahanId');
+    var tps_select = document.getElementById('no_tpsid');
+
+    dapil_select.onchange = function(){
+     let dapil = dapil_select.value
+     console.log(dapil)
+     fetch('/pilih-dapkec/'+dapil)
+     .then(function(tgpn){
+          return tgpn.json()
+          })
+     .then(function(data){
+     let optionHtml = '<option value=""> Pilih Nama Kecamatan</option>';
+     for(nm of data.nama){
+         optionHtml += '<option value="'+ nm.id +'">'+ nm.nama_kec+'</option>'
+         }
+     kec_select.innerHTML = optionHtml
+  })
+ } 
+
+    kec_select.onchange = function(){
+        var kecamatan = kec_select.value;
+        fetch('/pilihkel/'+kecamatan)
+        .then(function(res){
+            return res.json()
+        })
+        .then(function(res){
+           let optionHtml = '<option value=""> Pilih Nama Kelurahan</option>'
+           for(kec of res.Kelurahan){
+            optionHtml += '<option value="'+ kec.id +'">'+ kec.nama_kecamatan +'</option>'
+           }
+           kel_select.innerHTML = optionHtml
+        })
+    }
+
+
+    kel_select.onchange = function(){
+        var desa = kel_select.value;
+        fetch('/profiljson/'+desa)
+        .then(function(res){
+        return res.json()
+        })
+        .then(function(data){
+        optionHtml = '<option value=""> Pilih TPS</option>';
+        for(kel of data.TPS){
+            optionHtml += '<option value="'+ kel.id +'">'+ kel.nama_kelurahan+'</option>'
+        }
+        tps_select.innerHTML = optionHtml
+        })
+    }
+
+    // part cari nama caleg
+    let coba = document.getElementById('legis')               
+    let tabledt = document.getElementById('tabledata')
+    
+
+    coba.addEventListener('keyup', function(){
+        tabledt.innerHTML = ''
+        fetch('/cari-caleg/'+ coba.value)
+        .then(cek => {
+            return cek.json()
+        })
+        .then(cek => {
+            for(c of cek.nameparjson){
+                // console.log(c.Nama)
+                let row = `<tr>
+                             <th scope="row"></th>
+                             <td>${c.Nama}</td>
+                             <td>${c.total_suara}</td>
+                             <td>${c.Dapil}</td>
+                             <td>${c.TPS}</td>
+                             <td>
+                                <button type="button" class="btn btn-warning btn-sm" data-toggle="modal" data-target="#exampleModal">
+                                    Hapus
+                                </button>
+                                <a href="/edit-suara-caleg/${c.ID}" class="btn btn-primary btn-sm" >edit </a>
+                            </td>
+                         </tr>`
+                tabledt.innerHTML += row;
+            }
+        })
+    })
+
+    
+    
+</script>
+
+{% endblock %}
+
+{% endblock content %}

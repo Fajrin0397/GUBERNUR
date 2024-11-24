@@ -1,0 +1,80 @@
+{% extends 'base.html'%}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+      <div class="col-md-2"></div>
+      <div class="col-md-8">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th scope="col">No</th>
+                <th scope="col">Nama</th>
+                <th scope="col">Edit</th>
+                <th scope="col">Hapus</th>
+              </tr>
+            </thead>
+            <tbody>
+            {% for k in kel.items %}
+              <tr>
+                <th scope="row">{{loop.index}}</th>
+                <td>{{k.nama}}</td>
+                <td> <button type="button" class="btn btn-sm btn-warning" data-toggle="modal" data-target="#exampleModal-{{k.id}}">
+                hapus
+                </button></td>
+                <td> <a href="{{url_for('admin.edit_kelurahan', id=k.id)}}" class="btn btn-sm btn-primary">edit</a></td>
+              </tr>
+            
+                  <div class="modal fade" id="exampleModal-{{k.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                          </button>
+                        </div>
+                        <div class="modal-body">
+                         <strong> apakah ingin menghapus {{k.nama}}</strong>
+                        </div>
+                        <div class="modal-footer">
+                          <form action="{{url_for('admin.hapus_kel', id=k.id)}}" method="POST">
+                            <button type="submit" class="btn btn-danger btn-sm">Hapus</button>
+                          </form>
+                          <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Tutup</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+            {% endfor %}
+            </tbody>
+        </table>
+      </div>
+      <div class="col-md-2"></div>
+    </div>
+    <hr>
+    <div class="row">
+      <div class="col text-center p-2">
+        {% if kel.has_prev %}
+        <a href="{{url_for('admin.tabel_kelurahan', page=kel.prev_num)}}" class="btn btn-info btn-sm mt-3">previous</a>
+        {% endif %}
+        {% for page_num in kel.iter_pages() %}
+        {% if page_num %}
+        {% if kel.page == page_num %}
+        <a href="{{url_for('admin.tabel_kelurahan', page=page_num)}}" class="btn btn-info btn-sm mt-3">{{page_num}}</a>
+        {% else %}
+        <a href="{{url_for('admin.tabel_kelurahan', page=page_num)}}" class="btn btn-outline-info btn-sm mt-3">{{page_num}}</a>
+        {% endif %}
+        {% else %}
+        ... 
+        {% endif %}
+        {% endfor %}
+  
+        {% if kel.has_next %}
+        <a href="{{url_for('admin.tabel_kelurahan', page=kel.next_num)}}" class="btn btn-info btn-sm mt-3">next</a>
+        {% endif %}
+      </div>
+    </div>
+</div>
+
+{% endblock content %}

@@ -1,0 +1,20 @@
+{% extends 'base.html'%}
+{% block content %}
+<div class="container p-5 mt-5 ">
+
+    <div class="card text-center">
+        <div class="card-header">
+          {{prof.nama_tps}}
+        </div>
+        <div class="card-body">
+          <h5 class="card-title"></h5>
+          <p class="card-text"></p>
+          
+        </div>
+        <div class="card-footer text-muted">
+            <a href="{{ url_for('member.edit_profil_tps', id=prof.id) }}" class="btn btn-sm btn-secondary float-left">edit profil</a>
+            <a href="{{ url_for('member.edit_password', email=passw.email) }}" class="btn btn-sm btn-secondary float-right">edit password</a>
+        </div>
+      </div>
+</div>
+{% endblock content %}

@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="shadow p-3 mb-5 bg-white rounded mt-2">
+      <form id="" action="" method="POST" accept-charset="utf-8">
+        {{form1.csrf_token()}}
+    <div class="row">
+        <div class="col-md-3">
+              <span>
+                {{form1.kandidat_id.label(class="form-control-label")}}
+                {%if form1.kandidat_id.errors%}
+                    {{form1.kandidat_id(class="form-control is-invalid")}}
+                    <div class="invalid-feedback">
+                        {% for error in form1.kandidat_id.errors %}
+                        <span>{{error}}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{form1.kandidat_id(class="form-control")}}
+                {% endif %}
+            </span>
+         
+        </div>
+
+        <div class="col-md-3">  
+            <span>
+                {{form1.total.label(class="form-control-label")}}
+                {%if form1.total.errors%}
+                    {{form1.total(class="form-control is-invalid")}}
+                    <div class="invalid-feedback">
+                        {% for error in form1.total.errors %}
+                        <span>{{error}}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{form1.total(class="form-control")}}
+                {% endif %}
+            </span>
+        </div>
+
+        <div class="col-md-3">  
+          <span>
+              {{form1.kelurahanId.label(class="form-control-label")}}
+              {%if form1.kelurahanId.errors%}
+                  {{form1.kelurahanId(class="form-control is-invalid")}}
+                  <div class="invalid-feedback">
+                      {% for error in form1.kelurahanId.errors %}
+                      <span>{{error}}</span>
+                      {% endfor %}
+                  </div>
+              {% else %}
+                  {{form1.kelurahanId(class="form-control")}}
+              {% endif %}
+          </span>
+      </div>
+
+        <div class="col-md-3">
+            <span>
+                {{form1.no_tpsid.label(class="form-control-label")}}
+                {{form1.no_tpsid(class="form-control", title='Pilih kelurahan terlebih dahulu')}}
+            </span>
+        </div> 
+        <div>
+            <span>
+                {%if form1.emailName.errors%}
+                    {{form1.emailName(class="form-control is-invalid")}}
+                    <div class="invalid-feedback">
+                        {% for error in form1.emailName.errors %}
+                        <span>{{error}}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{form1.emailName(value=current_user.email)}}
+                {% endif %}
+            </span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4 mt-2">
+         {{form1.submit(class="btn btn-primary")}} 
+        </div>
+    </div>
+   </form>
+   <hr />
+   <table class="table table-striped">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Kandidat</th>
+      <th scope="col">Suara</th>
+      <th scope="col">Nama TPS</th>
+      <th scope="col">Aksi</th>
+    </tr>
+  </thead>
+  <tbody>
+      {% for s in sr %}
+    <tr>
+      <th scope="row">{{loop.index}}</th>
+      <td>{{s.hitungT.nama}}</td>
+      <td>{{s.total_s}}</td>
+      <td>{{s.htng.nama_tps}}</td>
+      <td>
+        <button type="button" class="btn btn-warning btn-sm" data-toggle="modal" data-target="#exampleModal-{{s.id}}">
+            Hapus
+        </button>
+        <a href="{{ url_for('Edithitung', id=s.id) }}" class="btn btn-primary btn-sm" >edit </a>
+      </td>
+    </tr>
+    <!-- modal-hapus -->
+  
+     
+  <div class="modal fade" id="exampleModal-{{s.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">{{s.htng.nama_tps}}</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+           <strong> apakah anda ingin menghapus hasil suara dari kandidat {{s.hitungT.nama}}</strong>
+        </div>
+        <div class="modal-footer">
+          <form method="POST" action="{{url_for('hapus_suara', id=s.id)}}">
+           <button type="submit" class="btn btn-danger btn-sm" >Hapus</button>
+          </form>
+          <button type="button" class="btn btn-warning btn-sm" data-dismiss="modal">Batal</button>
+        </div>
+      </div>
+    </div>
+  </div>
+      {%endfor%}
+  </tbody>
+</table>
+</div>
+{%block tail%}
+<script type="text/javascript" charset="utf-8">
+  var kel_select = document.getElementById('kelurahanId');
+  var tps_select = document.getElementById('no_tpsid')
+
+  kel_select.onchange = function(){
+    var desa = kel_select.value;
+    fetch('/profiljson/'+desa)
+    .then(function(res){
+      return res.json()
+    })
+    .then(function(data){
+      optionHtml = '';
+      for(kel of data.TPS){
+        optionHtml += '<option value="'+ kel.id +'">'+ kel.nama_kelurahan+'</option>'
+      }
+      tps_select.innerHTML = optionHtml
+    })
+  }
+</script>
+{% endblock %}
+{% endblock content %}

@@ -1,0 +1,209 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    #Regmap{width:80%;
+      height:500px;
+      position: relative;
+     
+      background-color:#f4f4f4;}
+</style>
+{% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          
+          {% for category, message in messages %}
+          <div class="alert alert-warning" role="alert">
+            {{ message }}
+          </div>
+          {% endfor %}
+        
+        {% endif %}
+  {% endwith %}
+<h1>Profil TPS</h1>
+<div class="col-md-2"></div>
+<div class="col-md-8">
+    <form method="POST">
+          {{form.csrf_token()}}
+        
+        <div class="form-group">
+          {{form.nama_tps.label(class="form-control-label")}}
+          {%if form.nama_tps.errors%}
+                {{form.nama_tps(class="form-control is-invalid")}}
+                <div class="invalid-feedback">
+                  {% for error in form.nama_tps.errors %}
+                  <span>{{error}}</span>
+                  {% endfor %}
+                </div>
+          {% else %}
+                {{form.nama_tps(class="form-control")}}
+          {% endif %}
+        </div>
+        <div class="form-group"  style="display: flexbox;">
+            <div class="row">
+                <div class="col-md-4">
+                    <span>          
+                    {{form.lokasi_lat.label(class=" form-control-label")}}
+                        {%if form.lokasi_lat.errors%}
+                            {{form.lokasi_lat(class="form-control is-invalid")}}
+                            <div class="invalid-feedback">
+                                {% for error in form.lokasi_lat.errors %}
+                                <span>{{error}}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{form.lokasi_lat(class=" form-control")}}
+                        {% endif %}
+                    </span> 
+                </div>
+                <div class="col-md-4">
+                <span>
+                    {{form.lokasi_lon.label(class=" form-control-label")}}
+                    {%if form.lokasi_lon.errors%}
+                        {{form.lokasi_lon(class="form-control is-invalid")}}
+                        <div class="invalid-feedback">
+                            {% for error in form.lokasi_lon.errors %}
+                            <span>{{error}}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{form.lokasi_lon(class="  form-control")}}
+                    {% endif %}  
+              </span>
+              </div>
+              
+            </div>
+        </div>  
+        <div id="Regmap">
+
+        </div>
+        <div class="form-group">
+          {{form.kecamatan.label(class="form-control-label")}}
+          {%if form.kecamatan.errors%}
+                {{form.kecamatan(class="form-control is-invalid")}}
+                <div class="invalid-feedback">
+                  {% for error in form.kecamatan.errors %}
+                  <span>{{error}}</span>
+                  {% endfor %}
+                </div>
+          {% else %}
+                {{form.kecamatan(class="form-control")}}
+          {% endif %}
+        </div>
+
+        <div class="form-group">
+          {{form.kelurahanId.label(class="form-control-label")}}
+          {%if form.kelurahanId.errors%}
+                {{form.kelurahanId(class="form-control is-invalid")}}
+                <div class="invalid-feedback">
+                  {% for error in form.kelurahanId.errors %}
+                  <span>{{error}}</span>
+                  {% endfor %}
+                </div>
+          {% else %}
+                {{form.kelurahanId(class="form-control")}}
+          {% endif %}
+        </div>
+
+        <div class="form-group">
+          {{form.user_id(value=current_user.id)}}
+        </div>
+        <div class="form-group">
+          {{form.emailName(value=current_user.email)}}
+        </div>
+        <div class="form-group">
+          {{form.prflT(class='btn btn-primary')}}
+        </div>
+      </form>
+</div>
+<div class="col-md-2"></div>    
+  {% block tail %}
+  <!-- <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" ></script> -->
+  <script>
+  var loclat = document.getElementById('lokasi_lat');
+  var loclng = document.getElementById('lokasi_lon');
+  const DEFAULT_CORD = [0.692574, 127.370179];
+      const Map = L.map("Regmap");
+    
+      L.Control.Watermark = L.Control.extend({
+        onAdd: function(Map) {
+            var tombol = L.DomUtil.create('div');
+
+            tombol.innerHTML = '<button style="background-color:blue;" onclick=get_loc><i class="fa-solid fa-loc"></i>Lokasi</button>';
+            tombol.style.width = '50px';
+
+            return tombol;
+        },
+
+        onRemove: function(Map) {
+            // Nothing to do here
+        }
+      });
+
+      L.control.watermark = function(opts) {
+          return new L.Control.Watermark(opts);
+      }
+
+      L.control.watermark({ position: 'bottomleft' }).addTo(Map);
+      
+      const atrib = "Leaflet with Tidore prog. performance";
+  
+      const osmTile = new L.TileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {minzoom:2, maxzoom:20, attribution:atrib});
+      
+      var Esri_WorldImagery = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+          attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+        });
+
+      Map.setView(new L.LatLng(DEFAULT_CORD[0], DEFAULT_CORD[1]), 15);
+      Map.addLayer(osmTile);
+
+      var baseMap = {
+      'OSM' : osmTile,
+      'Esri_WorldImagery': Esri_WorldImagery
+    }
+    L.control.layers(baseMap).addTo(Map)
+
+      const Marker = L.marker(DEFAULT_CORD).addTo(Map);
+        Map.on("click", function(e){
+      var lat = e.latlng.lat;
+      var lng = e.latlng.lng;
+      loclat.value = lat;
+      loclng.value = lng
+      Marker.setLatLng([lat, lng]);     
+    })
+    function get_loc(){
+      
+      navigator.geolocation.getCurrentPosition(function(posisi){
+        Map.setView(new L.LatLng(posisi.coords.latitude, posisi.coords.longitude), 15)
+        loclat.value = posisi.coords.latitude;
+        loclng.value = posisi.coords.longitude;
+        Marker.setLatLng([posisi.coords.latitude, posisi.coords.longitude]);
+      } )
+
+    }
+    get_loc()
+
+    var kcmtn = document.getElementById('kecamatan');
+    var klurhn = document.getElementById('kelurahanId');
+
+    kcmtn.onchange = function(){
+    var desa = kcmtn.value;
+    fetch('/desa/'+desa)
+    .then(function(res){
+      return res.json()
+    })
+    .then(function(data){
+      let optionHtml = '<option value=""> Pilih Nama Kelurahan</option>';
+      for(kel of data.kelurahan){
+        optionHtml += '<option value="'+ kel.id +'">'+ kel.nama_kelurahan+'</option>'
+      }
+      klurhn.innerHTML = optionHtml
+    })
+  }
+  
+  </script>
+  {% endblock %}
+{% endblock content %}
+<!--
+<li class="nav-item">
+  <a class="nav-link" href="">Data Mahasiswa</a>
+</li>-->

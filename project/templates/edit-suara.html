@@ -1,0 +1,179 @@
+{% extends 'base.html'%}
+{% block content %}
+
+<div class="shadow p-3 mb-5 bg-white rounded mt-1">
+    <form id="" action="" method="POST" accept-charset="utf-8">
+        {{form.csrf_token()}}
+    <div class="row">
+        <div class="col-md-3">  
+            <span>
+                {{form.ed_drdpil.label(class="form-control-label ")}}
+                {%if form.ed_drdpil.errors%}
+                    {{form.ed_drdpil(class="form-control is-invalid")}}
+                    <div class="invalid-feedback">
+                        {% for error in form.ed_drdpil.errors %}
+                        <span>{{error}}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{form.ed_drdpil(class="form-control form-control-sm")}}
+                {% endif %}
+            </span>
+        </div>
+        <div class="col-md-3">
+            {{form.ed_partaiId.label(class="form-control-label")}}
+            {%if form.ed_partaiId.errors%}
+                {{form.ed_partaiId(class="form-control is-invalid")}}
+                <div class="invalid-feedback">
+                    {% for error in form.ed_partaiId.errors %}
+                    <span>{{error}}</span>
+                    {% endfor %}
+                </div>
+            {% else %}
+                {{form.ed_partaiId(class="form-control form-control-sm")}}
+            {% endif %}
+        </div>
+
+        <div class="col-md-2">
+            <span>
+                {{form.ed_nm_calon.label(class="form-control-label")}}
+                {%if form.ed_nm_calon.errors%}
+                    {{form.ed_nm_calon(class="form-control is-invalid")}}
+                    <div class="invalid-feedback">
+                        {% for error in form.ed_nm_calon.errors %}
+                        <span>{{error}}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{form.ed_nm_calon(class="form-control form-control-sm")}}
+                {% endif %}
+            </span>
+        
+        </div>
+
+        <div class="col-md-2">
+          <span>
+            {{form.ed_kecamatanId.label(class="form-control-label")}}
+            {%if form.ed_kecamatanId.errors%}
+                {{form.ed_kecamatanId(class="form-control is-invalid")}}
+                <div class="invalid-feedback">
+                    {% for error in form.ed_kecamatanId.errors %}
+                    <span>{{error}}</span>
+                    {% endfor %}
+                </div>
+            {% else %}
+                {{form.ed_kecamatanId(class="form-control form-control-sm")}}
+            {% endif %}
+          </span>
+        </div>
+
+        <div class="col-md-2">
+            <span>
+                {{form.ed_kelurahanId.label(class="form-control-label")}}
+                {%if form.ed_kelurahanId.errors%}
+                    {{form.ed_kelurahanId(class="form-control is-invalid")}}
+                    <div class="invalid-feedback">
+                        {% for error in form.ed_kelurahanId.errors %}
+                        <span>{{error}}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{form.ed_kelurahanId(class="form-control form-control-sm")}}
+                {% endif %}
+            </span>
+        </div> 
+        <div class="col-md-2">
+                {{form.ed_no_tpsid.label(class="form-control-label ")}}
+                {%if form.ed_no_tpsid.errors%}
+                    {{form.ed_no_tpsid(class="form-control is-invalid")}}
+                    <div class="invalid-feedback">
+                        {% for error in form.ed_no_tpsid.errors %}
+                        <span>{{error}}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{form.ed_no_tpsid(class="form-control form-control-sm")}}
+                {% endif %}
+        </div>
+        <div class="col-md-1">
+        {{form.ed_total.label(class="form-control-label ")}}
+            {%if form.ed_total.errors%}
+                {{form.ed_total(class="form-control is-invalid")}}
+                <div class="invalid-feedback">
+                    {% for error in form.ed_total.errors %}
+                    <span>{{error}}</span>
+                    {% endfor %}
+                </div>
+            {% else %}
+                {{form.ed_total(class="form-control form-control-sm")}}
+            {% endif %}
+        </div>
+
+    </div>
+    <div class="row pb-3">
+        <div class="col-md-4 mt-2">
+        {{form.ed_submit(class="btn btn-primary mt-2 ")}} 
+        </div>
+    </div>
+    </form>
+</div>
+</div>
+<div class="col-mb-3"></div>
+{%block tail%}
+<script>
+    var dapil_select = document.getElementById('ed_drdpil');
+    var nm_caleg = document.getElementById('ed_nm_calon');
+
+    dapil_select.onchange = function(){
+        let dapil = dapil_select.value
+        // console.log(dapil)
+        fetch('/nama-caleg/'+dapil)
+         .then(function(tgpn){
+             return tgpn.json()
+         })
+         .then(function(data){
+            optionHtml = '';
+            for(nm of data.nama){
+                optionHtml += '<option value="'+ nm.id +'">'+ nm.nama_caleg+'</option>'
+            }
+            nm_caleg.innerHTML = optionHtml
+         })
+    }
+
+    var kec_select = document.getElementById('ed_kecamatanId');
+    var kel_select = document.getElementById('ed_kelurahanId');
+    var tps_select = document.getElementById('ed_no_tpsid')
+
+    kec_select.onchange = function(){
+        var kecamatan = kec_select.value;
+        fetch('/pilihkel/'+kecamatan)
+        .then(function(res){
+            return res.json()
+        })
+        .then(function(res){
+           let optionHtml = ''
+           for(kec of res.Kelurahan){
+            optionHtml += '<option value="'+ kec.id +'">'+ kec.nama_kecamatan +'</option>'
+           }
+           kel_select.innerHTML = optionHtml
+        })
+    }
+
+    kel_select.onchange = function(){
+        var desa = kel_select.value;
+        fetch('/profiljson/'+desa)
+        .then(function(res){
+        return res.json()
+        })
+        .then(function(data){
+        let optionHtml = '';
+        for(kel of data.TPS){
+            optionHtml += '<option value="'+ kel.id +'">'+ kel.nama_kelurahan+'</option>'
+        }
+        tps_select.innerHTML = optionHtml
+        })
+    }
+</script>
+
+{% endblock %}
+{% endblock content %}

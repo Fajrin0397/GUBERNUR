@@ -1,0 +1,20 @@
+{% extends 'base.html'%}
+
+{% block content %}
+<div class="mr-3">
+  <form action="" method="POST" accept-charset="utf-8">
+    <div class="row">
+      <div class="col-md-2"></div>
+      <div class="col-md-8 mr-2">
+        {{form.csrf_token()}}
+        {{form.nama.label}}
+        {{form.nama(class="form-control")}}
+        {{form.tambah(class='btn btn-sm btn-secondary mt-1')}}
+
+    </div>
+      <div class="col-md-2"></div>
+    </div>
+
+  </form>
+</div>
+{% endblock content %}

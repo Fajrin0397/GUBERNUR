@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    #Regmap{width:80%;
+      height:500px;
+      position: relative;
+     
+      background-color:#f4f4f4;}
+</style>
+<h1>Profil TPS</h1>
+<div class="col-md-2"></div>
+<div class="col-md-8">
+  <form method="POST">
+       {{formeditpfl.csrf_token()}}
+        
+    <div class="form-group">
+      {{formeditpfl.ed_nama_tps.label(class="form-control-label")}}
+      {%if formeditpfl.ed_nama_tps.errors%}
+            {{formeditpfl.ed_nama_tps(class="form-control is-invalid")}}
+            <div class="invalid-feedback">
+              {% for error in formeditpfl.ed_nama_tps.errors %}
+              <span>{{error}}</span>
+              {% endfor %}
+            </div>
+       {% else %}
+            {{formeditpfl.ed_nama_tps(class="form-control")}}
+       {% endif %}
+     </div>
+     <div class="form-group"  style="display: flexbox;">
+         <div class="row">
+             <div class="col-md-4">
+                <span>          
+                {{formeditpfl.ed_lokasi_lat.label(class=" form-control-label")}}
+                    {%if formeditpfl.ed_lokasi_lat.errors%}
+                        {{formeditpfl.ed_lokasi_lat(class="form-control is-invalid")}}
+                        <div class="invalid-feedback">
+                            {% for error in formeditpfl.ed_lokasi_lat.errors %}
+                            <span>{{error}}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{formeditpfl.ed_lokasi_lat(class=" form-control")}}
+                    {% endif %}
+                </span> 
+            </div>
+            <div class="col-md-4">
+            <span>
+                {{formeditpfl.ed_lokasi_lon.label(class=" form-control-label")}}
+                {%if formeditpfl.ed_lokasi_lon.errors%}
+                    {{formeditpfl.ed_lokasi_lon(class="form-control is-invalid")}}
+                    <div class="invalid-feedback">
+                        {% for error in formeditpfl.ed_lokasi_lon.errors %}
+                        <span>{{error}}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{formeditpfl.ed_lokasi_lon(class="  form-control")}}
+                {% endif %}  
+          </span>
+          </div>
+          
+        </div>
+    </div>  
+    <div id="Regmap">
+
+    </div>
+    <div class="form-group">
+      {{formeditpfl.ed_kecamatan.label(class="form-control-label")}}
+      {%if formeditpfl.ed_kecamatan.errors%}
+            {{formeditpfl.ed_kecamatan(class="form-control is-invalid")}}
+            <div class="invalid-feedback">
+              {% for error in formeditpfl.ed_kecamatan.errors %}
+              <span>{{error}}</span>
+              {% endfor %}
+            </div>
+       {% else %}
+            {{formeditpfl.ed_kecamatan(class="form-control")}}
+       {% endif %}
+     </div>
+     <div class="form-group">
+      {{formeditpfl.ed_kelurahan.label(class="form-control-label")}}
+      {%if formeditpfl.ed_kelurahan.errors%}
+            {{formeditpfl.ed_kelurahan(class="form-control is-invalid")}}
+            <div class="invalid-feedback">
+              {% for error in formeditpfl.ed_kelurahan.errors %}
+              <span>{{error}}</span>
+              {% endfor %}
+            </div>
+       {% else %}
+            {{formeditpfl.ed_kelurahan(class="form-control")}}
+       {% endif %}
+     </div>
+     <div class="form-group">
+      {{formeditpfl.ed_user_id(value=current_user.id)}}
+     </div>
+     <div class="form-group">
+      {{formeditpfl.ed_emailName(value=current_user.email)}}
+     </div>
+     <div class="form-group">
+      {{formeditpfl.ed_prflT(class='btn btn-primary')}}
+     </div>
+     
+</form>
+</div>
+<div class="col-md-2"></div>  
+  {% block tail %}
+  <!-- <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" ></script> -->
+  <script>
+  var loclat = document.getElementById('ed_lokasi_lat');
+  var loclng = document.getElementById('ed_lokasi_lon');
+  const DEFAULT_CORD = [0.692574, 127.370179];
+      const Map = L.map("Regmap");
+  
+      
+      const atrib = "Leaflet with Tidore prog. performance";
+  
+      const osmTile = new L.TileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {minzoom:2, maxzoom:20, attribution:atrib});
+      
+      Map.setView(new L.LatLng(DEFAULT_CORD[0], DEFAULT_CORD[1]), 10);
+      Map.addLayer(osmTile);
+
+      const Marker = L.marker(DEFAULT_CORD).addTo(Map);
+        Map.on("click", function(e){
+      var lat = e.latlng.lat;
+      var lng = e.latlng.lng;
+      loclat.value = lat;
+      loclng.value = lng
+      Marker.setLatLng([lat, lng]);  
+      
+      
+    })
+
+    var kcmtn = document.getElementById('ed_kecamatan');
+    var klurhn = document.getElementById('ed_kelurahan');
+
+    kcmtn.onchange = function(){
+    var desa = kcmtn.value;
+    fetch('/desa/'+desa)
+    .then(function(res){
+      return res.json()
+    })
+    .then(function(data){
+      let optionHtml = '<option value="">Pilih Desa</option>';
+      for(kel of data.kelurahan){
+        optionHtml += '<option value="'+ kel.id +'">'+ kel.nama_kelurahan+'</option>'
+      }
+      klurhn.innerHTML = optionHtml
+    })
+  }
+  </script>
+  {% endblock %}
+{% endblock content %}
+<!--
+<li class="nav-item">
+  <a class="nav-link" href="">Data Mahasiswa</a>
+</li>-->

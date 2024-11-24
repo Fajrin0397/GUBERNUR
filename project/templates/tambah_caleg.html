@@ -1,0 +1,169 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="shadow p-3 mb-5 bg-white rounded mt-4">
+    <form action="" method="post">
+        {{form.csrf_token()}}
+        <div class="row">
+            <div class="col-md-2">
+                {{form.nama.label(class="form-control-label")}}
+                {%if form.nama.errors%}
+                    {{form.nama(class="form-control is-invalid")}}
+                    <div class="invalid-feedback">
+                        {% for error in form.nama.errors %}
+                        <span>{{error}}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{form.nama(class="form-control form-control-sm")}}
+                {% endif %}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-2 mt-2">
+                {{form.tambah(class="btn btn-primary")}}
+            </div>
+        </div>
+        
+    </form>
+</div>
+
+<div class="container">
+    <div class="row">
+        <div class="shadow p-3 mb-5 bg-white rounded mt-1">
+            <input type="text" name="cari" class="p-1 mb-4 form-control " id="cari" placeholder="cari nama caleg">
+            <button id="tomCari" class="btn button-lg btn-info ">cari</button>
+            <table class="table table-striped ">
+                <thead>
+                  <tr>
+                    <th scope="col">No</th>
+                    <th scope="col">Nama Legislatif</th>
+                    <th scope="col">Type</th>
+                    <th scope="col">Nama Dapil</th>
+                    <th scope="col">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="mydata">
+                   {% for cl in page.items %}
+                    <tr >
+                        <th scope="row">{{loop.index}}</th>
+                        <td>{{cl.nama}}</td>
+                        <td>{{cl.thype.tipe| truncate(6)}}</td>
+                        <td>{{cl.calegid.nama_dapil}}</td>
+                        <td>{{cl.partai.partai}}</td>
+                        <td>
+                            <button type="button" class="btn btn-warning btn-sm" data-toggle="modal" data-target="#exampleModal-{{cl.id}}">
+                                Hapus
+                            </button>
+                            <a href="{{url_for('admin.edit_caleg', id=cl.id)}}" class="btn btn-primary btn-sm" >edit </a>
+                        </td>
+                    </tr>
+              <!-- modal-hapus -->
+                
+                
+                    <div class="modal fade" id="exampleModal-{{cl.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel"></h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <strong> apakah anda ingin menghapus hasil suara dari kandidat</strong>
+                        </div>
+                        <div class="modal-footer">
+
+                            <form method="POST" action="{{url_for('admin.hapus_caleg', id=cl.id)}}">
+                                 <button type="submit" class="btn btn-danger btn-sm" >Hapus</button>
+                            </form>
+                            <button type="button" class="btn btn-warning btn-sm" data-dismiss="modal">Batal</button>
+                        </div>
+                        </div>
+                    </div>
+                    </div>
+            {% endfor %}
+            </tbody>
+          </table>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col text-center p-2">
+          {% if page.has_prev %}
+          <a href="{{url_for('admin.tambah_caleg', page=page.prev_num)}}" class="btn btn-info btn-sm mt-3">previous</a>
+          {% endif %}
+          {% for page_num in page.iter_pages() %}
+          {% if page_num %}
+          {% if page.page == page_num %}
+          <a href="{{url_for('admin.tambah_caleg', page=page_num)}}" class="btn btn-info btn-sm mt-3">{{page_num}}</a>
+          {% else %}
+          <a href="{{url_for('admin.tambah_caleg', page=page_num)}}" class="btn btn-outline-info btn-sm mt-3">{{page_num}}</a>
+          {% endif %}
+          {% else %}
+          ... 
+          {% endif %}
+          {% endfor %}
+          {% if page.has_next %}
+          <a href="{{url_for('admin.tambah_caleg', page=page.next_num)}}" class="btn btn-info btn-sm mt-3">next</a>
+          {% endif %}
+        </div>
+    </div>
+</div>
+<script>
+    let coba = document.getElementById('cari');
+    let tabbody = document.getElementById('mydata')                 
+    let tomcr = document.getElementById('tomCari')
+
+    
+    tomcr.addEventListener('click', () => {
+        tabbody.innerHTML = ''
+        fetch('/hasil-pencarian/'+coba.value)
+        .then(cek =>{
+            return cek.json()
+        })
+        .then(cek => {
+            for(ck of cek.hsl){
+                let row = `<tr>
+                             <th scope="row"></th>
+                             <td>${ck.kandidat}</td>
+                             <td>${ck.Dapil}</td>
+                             <td>${ck.Type}</td>
+                             <td>
+                                <button type="button" class="btn btn-warning btn-sm" data-toggle="modal" data-target="#exampleModal-${ck.ID}">
+                                    Hapus
+                                </button>
+                                <a href="/edit-caleg/${ck.ID}" class="btn btn-primary btn-sm" >edit </a>
+                            </td>
+                         </tr>
+                         <div class="modal fade" id="exampleModal-${ck.ID}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel"></h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <strong> apakah anda ingin menghapus hasil suara dari kandidat</strong>
+                            </div>
+                            <div class="modal-footer">
+                                <form method="POST" action="/hapus-caleg/${ck.ID}">
+                                    <button type="submit" class="btn btn-danger btn-sm" >Hapus</button>
+                                </form>
+                                <button type="button" class="btn btn-warning btn-sm" data-dismiss="modal">Batal</button>
+                            </div>
+                            </div>
+                            </div>
+                           </div>`
+                tabbody.innerHTML += row;
+            }
+            
+        })
+        
+    })
+
+
+</script>
+{% endblock content %}

@@ -1,0 +1,84 @@
+<!-- 
+{% extends "base.html" %}
+{% block content %}
+<style>
+    #activ_map{width:100%;
+      height:500px;
+      position: relative;
+      margin-top:1% ;
+      background-color:#f4f4f4;}
+
+      @media only screen and (max-width: 2000px) {
+        #activ_map {
+          height:750px;
+        }
+      }
+
+</style>
+<div id="activ" style="width: 450px;">
+  <div id="informasi"></div>
+  
+</div>
+ 
+</div>
+<div id="activ_map">
+
+</div>
+{% block tail%}
+<script>
+  const DEFAULT_CORD = [0.692574, 127.370179];
+      const Map = L.map("activ_map");
+  
+      
+      const atrib = "Leaflet with Tidore prog. performance";
+  
+      const osmTile = new L.TileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {minzoom:2, maxzoom:20, attribution:atrib});
+      
+      Map.setView(new L.LatLng(DEFAULT_CORD[0], DEFAULT_CORD[1]), 10);
+      Map.addLayer(osmTile);
+
+      const activs = L.layerGroup().addTo(Map)
+      
+      //   Map.on("click", function(e){
+      // var lat = e.latlng.lat;
+      // var lng = e.latlng.lng;
+      // loclat.value = lat;
+      // loclng.value = lng
+      // Marker.setLatLng([lat, lng]);  
+      
+      
+    // })
+
+    let activ = L.control.sidebar('activ', {
+      position: 'left'
+    });
+  
+    Map.addControl(activ);  
+    var easy = L.easyButton('fa-exchange', function(){
+    activ.toggle();
+    }).addTo(Map);
+    
+    socket = io()
+
+    socket.on('member', data =>{
+    //  Marker.setLatLng([data.lat, data.lng]).addTo()
+    // markers.setLatLng(data.lat, data.lng).addTo(activs)
+    for(let x in data){
+      console.log(data[x].Nama)
+      let markers = L.marker([data[x].lat, data[x].lng]).addTo(activs)
+
+    }
+    
+    socket.emit('logout', data.Nama)
+    })
+
+
+    socket.on('dissconnect')
+</script>
+{% endblock %}
+
+{% endblock content %}
+<!--
+<li class="nav-item">
+  <a class="nav-link" href="">Data Mahasiswa</a>
+</li>--> -->
